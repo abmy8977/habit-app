@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="습관 관리">
+<meta name="theme-color" content="#1D9E75">
+<title>습관 관리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --teal:#1D9E75;--blue:#378ADD;--purple:#7F77DD;--amber:#BA7517;
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efec;
+  --text:#1a1a1a;--text2:#6b6b6b;--text3:#9e9e9e;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.2);
+  --radius:12px;--radius-sm:8px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--text:#f0f0f0;--text2:#a0a0a0;--text3:#666;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22)}
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;padding-bottom:80px}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:env(safe-area-inset-top,16px) 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:18px;font-weight:600}
+.topbar .dt{font-size:12px;color:var(--text2)}
+.main{padding:12px 16px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:0.5px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s}
+.nav-btn i{font-size:22px}
+.nav-btn.on{color:var(--teal)}
+.sec{display:none}.sec.on{display:block}
+.ring-wrap{display:flex;justify-content:center;padding:16px 0}
+.ring{position:relative;width:100px;height:100px}
+.ring svg{transform:rotate(-90deg)}
+.ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-num .n{font-size:26px;font-weight:600}
+.ring-num .s{font-size:12px;color:var(--text2)}
+.cat-block{background:var(--bg);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;border:0.5px solid var(--border)}
+.cat-hd{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:0.5px solid var(--border)}
+.cat-hd i{font-size:16px}.cat-hd span{flex:1;font-size:14px;font-weight:500}
+.cat-hd .cp{font-size:12px;color:var(--text2)}
+.habit{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .1s}
+.habit:last-child{border-bottom:none}
+.habit:active{background:var(--bg2)}
+.hck{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:13px;color:transparent}
+.hck.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.hlb{font-size:13px;flex:1}.hlb.on{color:var(--text3);text-decoration:line-through}
+.htag{font-size:10px;padding:2px 6px;border-radius:6px;font-weight:500;flex-shrink:0}
+.t-am{background:#E1F5EE;color:#0F6E56}.t-pm{background:#E6F1FB;color:#185FA5}.t-any{background:#F1EFE8;color:#5F5E5A}
+.card{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:14px;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:500;margin-bottom:12px}
+.wk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wk-lbl{font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px}
+.wk-day{aspect-ratio:1;border-radius:6px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);background:var(--bg);transition:all .15s}
+.wk-day.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+.wk-day.today{border:1.5px solid var(--blue);color:var(--blue)}
+.wk-day.today.done{background:var(--teal);color:#fff;border-color:var(--teal)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-row:last-child{margin-bottom:0}
+.bar-row span:first-child{font-size:12px;color:var(--text2);width:56px;flex-shrink:0}
+.bar-track{flex:1;height:7px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s}
+.bar-row span:last-child{font-size:12px;color:var(--text2);width:30px;text-align:right}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.scard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.scard .n{font-size:24px;font-weight:600}.scard .l{font-size:11px;color:var(--text2);margin-top:2px}
+.str-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.str-row:last-child{border-bottom:none}
+.str-row i{font-size:16px;color:var(--text2)}.str-row .sl{flex:1;font-size:13px}.str-row .sv{font-size:13px;font-weight:500;color:var(--teal)}
+.tip{background:var(--bg2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text2);line-height:1.7;border-left:3px solid var(--teal)}
+.tip b{color:var(--text);font-weight:500}
+.notif-btn{width:100%;padding:12px;border-radius:var(--radius-sm);border:0.5px solid var(--border2);background:transparent;color:var(--text);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.notif-btn i{font-size:16px;color:var(--teal)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>습관 관리</h1>
+  <span class="dt" id="today-date"></span>
+</div>
+
+<div class="main">
+  <div id="sec-home" class="sec on">
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#e0e0e0" stroke-width="8"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#1D9E75" stroke-width="8" stroke-linecap="round"
+            stroke-dasharray="251" id="ring-arc" stroke-dashoffset="251"/>
+        </svg>
+        <div class="ring-num">
+          <span class="n" id="rn">0</span>
+          <span class="s">/ 12 완료</span>
+        </div>
+      </div>
+    </div>
+    <div id="habit-list"></div>
+    <button class="notif-btn" onclick="requestNotif()"><i class="ti ti-bell"></i> 매일 알림 설정하기</button>
+  </div>
+
+  <div id="sec-week" class="sec">
+    <div class="card">
+      <div class="card-title">이번 주 완료 기록</div>
+      <div class="wk-grid" id="wk-lbl-row" style="margin-bottom:4px"></div>
+      <div class="wk-grid" id="wk-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">영역별 오늘 달성률</div>
+      <div id="bar-chart"></div>
+    </div>
+  </div>
+
+  <div id="sec-stats" class="sec">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="card">
+      <div class="card-title">영역별 현황</div>
+      <div id="streak-list"></div>
+    </div>
+    <div class="tip"><b>오늘의 조언:</b> <span id="daily-tip"></span></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn on" onclick="go('home',this)" aria-label="오늘"><i class="ti ti-checkbox"></i>오늘</button>
+  <button class="nav-btn" onclick="go('week',this)" aria-label="주간"><i class="ti ti-calendar"></i>주간</button>
+  <button class="nav-btn" onclick="go('stats',this)" aria-label="통계"><i class="ti ti-chart-bar"></i>통계</button>
+</nav>
+
+<script>
+const CATS=[
+  {id:'sleep',label:'수면/체력',icon:'ti-moon',color:'#1D9E75',habits:[
+    {l:'취침 30분 전 스마트폰 끄기',t:'pm'},
+    {l:'오전 7시 전 기상 + 햇빛 5분',t:'am'},
+    {l:'낮잠 20분 이내로 제한',t:'any'}
+  ]},
+  {id:'focus',label:'집중력/루틴',icon:'ti-focus-2',color:'#378ADD',habits:[
+    {l:'아침 MIT 3가지 적기',t:'am'},
+    {l:'포모도로 25분 집중 1회',t:'any'},
+    {l:'작업 전환 시 물 한 잔',t:'any'}
+  ]},
+  {id:'emotion',label:'감정/스트레스',icon:'ti-heart',color:'#7F77DD',habits:[
+    {l:'아침 좌선 10분',t:'am'},
+    {l:'저녁 3줄 일기',t:'pm'},
+    {l:'감사한 것 1가지',t:'pm'}
+  ]},
+  {id:'time',label:'시간/우선순위',icon:'ti-clock',color:'#BA7517',habits:[
+    {l:'회사 업무 시간 블록 설정',t:'am'},
+    {l:'투자 리서치 시간 블록 설정',t:'any'},
+    {l:'하루 마감 리뷰 5분',t:'pm'}
+  ]}
+];
+const TIPS=[
+  '좌선 후 3분 — 오늘 일어난 일을 공성(空性)의 시각으로 관찰하세요.',
+  '두 번 연속 빠지지 않기 규칙이 완벽주의보다 강합니다.',
+  '신화지관 업무와 투자 리서치 시간을 분리하면 인지 전환 비용이 줄어듭니다.',
+  '작게 하나씩. 12개보다 3개를 꾸준히가 낫습니다.',
+  '취침 30분 전 스마트폰 차단 하나만으로 수면 질이 눈에 띄게 달라집니다.',
+  '습관은 완성이 아니라 오늘 한 번의 선택입니다.',
+  '체력이 곧 투자 실력입니다. 수면부터 챙기세요.'
+];
+const todayKey=new Date().toISOString().slice(0,10);
+let state=JSON.parse(localStorage.getItem('hb-'+todayKey)||'{}');
+let weekData=JSON.parse(localStorage.getItem('hb-week')||'{}');
+function save(){
+  try{localStorage.setItem('hb-'+todayKey,JSON.stringify(state));localStorage.setItem('hb-week',JSON.stringify(weekData));}catch(e){}
+}
+function getDateStr(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10);}
+document.getElementById('today-date').textContent=new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+
+function buildHome(){
+  const el=document.getElementById('habit-list');el.innerHTML='';
+  CATS.forEach((cat,ci)=>{
+    const done=cat.habits.filter((_,i)=>state[cat.id+i]).length;
+    const b=document.createElement('div');b.className='cat-block';
+    b.innerHTML=`<div class="cat-hd"><i class="ti ${cat.icon}" style="color:${cat.color}" aria-hidden="true"></i><span>${cat.label}</span><span class="cp">${done}/${cat.habits.length}</span></div>`;
+    cat.habits.forEach((h,i)=>{
+      const key=cat.id+i;const on=!!state[key];
+      const tc=h.t==='am'?'t-am':h.t==='pm'?'t-pm':'t-any';
+      const tl=h.t==='am'?'오전':h.t==='pm'?'저녁':'언제든';
+      const row=document.createElement('div');row.className='habit';
+      row.innerHTML=`<div class="hck${on?' on':''}" id="c-${key}">✓</div><span class="hlb${on?' on':''}" id="l-${key}">${h.l}</span><span class="htag ${tc}">${tl}</span>`;
+      row.onclick=()=>{
+        state[key]=!state[key];
+        document.getElementById('c-'+key).classList.toggle('on',state[key]);
+        document.getElementById('l-'+key).classList.toggle('on',state[key]);
+        const d=cat.habits.filter((_,j)=>state[cat.id+j]).length;
+        b.querySelector('.cp').textContent=`${d}/${cat.habits.length}`;
+        updateRing();save();
+      };
+      b.appendChild(row);
+    });
+    el.appendChild(b);
+  });
+  updateRing();
+}
+
+function updateRing(){
+  const total=12;
+  const done=CATS.reduce((s,c)=>s+c.habits.filter((_,i)=>state[c.id+i]).length,0);
+  const circ=2*Math.PI*40;
+  document.getElementById('ring-arc').setAttribute('stroke-dashoffset',(circ*(1-done/total)).toFixed(1));
+  document.getElementById('rn').textContent=done;
+}
+
+function buildWeek(){
+  const days=['월','화','수','목','금','토','일'];
+  const dow=new Date().getDay();const todayIdx=dow===0?6:dow-1;
+  const lr=document.getElementById('wk-lbl-row');const gr=document.getElementById('wk-grid');
+  lr.innerHTML='';gr.innerHTML='';
+  days.forEach((d,i)=>{
+    const l=document.createElement('div');l.className='wk-lbl';l.textContent=d;lr.appendChild(l);
+    const ds=getDateStr(i-todayIdx);
+    const cell=document.createElement('div');
+    cell.className='wk-day'+(weekData[ds]?' done':'')+(i===todayIdx?' today':'');
+    cell.textContent=new Date(ds+'T00:00:00').getDate();
+    cell.onclick=()=>{weekData[ds]=!weekData[ds];cell.classList.toggle('done',!!weekData[ds]);save();};
+    gr.appendChild(cell);
+  });
+  const bc=document.getElementById('bar-chart');bc.innerHTML='';
+  CATS.forEach(cat=>{
+    const done=cat.habits.filter((_,i)=>state[cat.id+i]).length;
+    const pct=Math.round(done/cat.habits.length*100);
+    bc.innerHTML+=`<div class="bar-row"><span>${cat.label.split('/')[0]}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${cat.color}"></div></div><span>${pct}%</span></div>`;
+  });
+}
+
+function buildStats(){
+  const done=CATS.reduce((s,c)=>s+c.habits.filter((_,i)=>state[c.id+i]).length,0);
+  const wkDone=Object.values(weekData).filter(Boolean).length;
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="scard"><div class="n">${done}/12</div><div class="l">오늘 완료</div></div>
+    <div class="scard"><div class="n">${Math.round(done/12*100)}%</div><div class="l">오늘 달성률</div></div>
+    <div class="scard"><div class="n">${wkDone}일</div><div class="l">이번 주 완료</div></div>
+    <div class="scard"><div class="n">${Math.round(wkDone/7*100)}%</div><div class="l">주간 달성률</div></div>`;
+  const sl=document.getElementById('streak-list');sl.innerHTML='';
+  CATS.forEach(cat=>{
+    const done=cat.habits.filter((_,i)=>state[c.id+i]).length;
+    sl.innerHTML+=`<div class="str-row"><i class="ti ${cat.icon}" aria-hidden="true"></i><span class="sl">${cat.label}</span><span class="sv">${cat.habits.filter((_,i)=>state[cat.id+i]).length}/${cat.habits.length}</span></div>`;
+  });
+  document.getElementById('daily-tip').textContent=TIPS[new Date().getDay()%TIPS.length];
+}
+
+function go(id,btn){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('sec-'+id).classList.add('on');
+  if(id==='week')buildWeek();
+  if(id==='stats')buildStats();
+}
+
+async function requestNotif(){
+  if(!('Notification' in window)){alert('이 브라우저는 알림을 지원하지 않습니다.');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    alert('알림이 허용되었습니다!\n매일 오전 8시와 저녁 9시에 알림을 받으려면\n브라우저를 열어두거나 PWA로 설치하세요.');
+    scheduleNotif();
+  }else{
+    alert('알림 권한이 거부되었습니다.\n브라우저 설정에서 알림을 허용해 주세요.');
+  }
+}
+
+function scheduleNotif(){
+  const now=new Date();
+  const morning=new Date(now);morning.setHours(8,0,0,0);
+  const evening=new Date(now);evening.setHours(21,0,0,0);
+  [morning,evening].forEach(t=>{
+    const diff=t-now;
+    if(diff>0) setTimeout(()=>{
+      new Notification('습관 체크 시간',{body:'오늘의 습관을 확인해보세요!',icon:''});
+    },diff);
+  });
+}
+
+buildHome();
+</script>
+</body>
+</html>
